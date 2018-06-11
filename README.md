@@ -2,5 +2,5 @@
 - [analyzing binaries and intro to pwning](/pwn01)
 
 
-contacts
+contacts  
 yuasabe[at]gmail.com
