@@ -10,47 +10,48 @@
 - Windowsであれば、OllyDbg, うさみみハリケーン、 IDA Free, ILSpy, Bz等があればよい
 
 ## ３つの解析手法
-### 表層解析
-- フォーマットを確認
-- 印字可能文字列を確認
-### 実行環境を用意して動的解析
-### 逆アセンブルして静的解析
+- 表層解析
+	- フォーマットを確認
+	- 印字可能文字列を確認
+- 実行環境を用意して動的解析
+- 逆アセンブルして静的解析
 
 ## Intro to gdb debugger
-disas (function name)
-x/ (命令数) i (先頭アドレス)
-set disassembly-flavor (intel/att)
-b (関数名)
-b (アドレス)
-show breakpoint info: i b
-delete breakpoint: d (breakpoint num)
-disable (breakpoint num) / enable
-ignore
-run: r
-stop at main: start
-set args (cli arg1) (cli arg2)
-set (レジスタ名)=(値)
-step over: ni
-step in: si
-continue: c
-read register: p (レジスタ名)
-info registers: i r
-x/(表示する数)(メモリサイズbhwg)(表示フォーマットsix) (表示するメモリの先頭アドレス)
-backtrace: bt
-watch/rw/aw (メモリアドレス)
+- disas (function name)
+- x/ (命令数) i (先頭アドレス)
+- set disassembly-flavor (intel/att)
+- b (関数名)
+- b (アドレス)
+- show breakpoint info: i b
+- delete breakpoint: d (breakpoint num)
+- disable (breakpoint num) / enable
+- ignore
+- run: r
+- stop at main: start
+- set args (cli arg1) (cli arg2)
+- set (レジスタ名)=(値)
+- step over: ni
+- step in: si
+- continue: c
+- read register: p (レジスタ名)
+- info registers: i r
+- x/(表示する数)(メモリサイズbhwg)(表示フォーマットsix) (表示するメモリの先頭アドレス)
+- backtrace: bt
+- watch/rw/aw (メモリアドレス)
 
 ## アセンブリ言語
-レジスタとスタック x86アーキテクチャ
-レジスタ：プロセッサ内に存在する記憶装置であり、メモリや補助記憶装置と比較して高速に動作する。32bit CPU, 64bit CPU
-x86アーキテクチャのレジスタ（32 bit registers）
-EAX, ECX, EDX, EBX, ESI, EDIの６つの汎用レジスタ
-EBP, ESP, EIPの特殊レジスタ
-EFLAGSのフラグレジスタ
-セグメントレジスタ
+- レジスタとスタック x86アーキテクチャ
+- レジスタ：プロセッサ内に存在する記憶装置であり、メモリや補助記憶装置と比較して高速に動作する。32bit CPU, 64bit CPU
+- x86アーキテクチャのレジスタ（32 bit registers）
+- EAX, ECX, EDX, EBX, ESI, EDIの６つの汎用レジスタ
+- EBP, ESP, EIPの特殊レジスタ
+- EFLAGSのフラグレジスタ
+- セグメントレジスタ
 
 
 ### Example assembly code and its corresponding stacks
 
+```
 Func1:
     push arg2
     push arg1
@@ -67,66 +68,70 @@ Func2:
     mov esp, ebp
     pop ebp
     ret
+```
 
 
 ### disassemble from binary using objdump
-`objdump -d -m intel crack_me`
+```
+$ objdump -d -m intel crack_me
+```
 
 rasm2 -d 9090 -> nop nop
 
 C言語でプログラムを書き、コンパイルしてバイナリにしたものを解析してみる
 
-gcc -Wall hello.c -o hello
-
-objdump -d hello -x86-asm-syntax=intel
+```
+$ gcc -Wall hello.c -o hello
+$ objdump -d hello -x86-asm-syntax=intel
+```
 
 ## Upcoming CTFs
 ### Google CTF 2018
 https://capturetheflag.withgoogle.com/
-How can I prepare for this competition?
-  A good introduction to CTFs is available here:
-    https://trailofbits.github.io/ctf/index.html
+How can I prepare for this competition?  
+  A good introduction to CTFs is available here:  
+    https://trailofbits.github.io/ctf/index.html  
   If you want to practice similar challenges to the ones you will be asked for
-  you can play security wargames such as:
-    * Microcorruption: https://microcorruption.com/
-    * Cryptopals: https://cryptopals.com/
-    * XSS Game: https://www.xssgame.com/
+  you can play security wargames such as:  
+    * Microcorruption: https://microcorruption.com/  
+    * Cryptopals: https://cryptopals.com/  
+    * XSS Game: https://www.xssgame.com  
   If you want even more, there is also a long list of sites that offer
-  security-related wargames here:
-    https://www.wechall.net/active_sites
-  And you can find the write-ups of Google's last year CTF here:
-    https://drive.google.com/corp/drive/folders/0BwMPuUHZOj0nZ2dGZS1KbWNGN0E
-  and here:
-    https://ctftime.org/event/455/tasks/
+  security-related wargames here:  
+    https://www.wechall.net/active_sites  
+  And you can find the write-ups of Google's last year CTF here:  
+    https://drive.google.com/corp/drive/folders/0BwMPuUHZOj0nZ2dGZS1KbWNGN0E  
+  and here:  
+    https://ctftime.org/event/455/tasks/  
 
-https://github.com/google/google-ctf
+https://github.com/google/google-ctf  
 
 
 # into to pwning
 ## basic tools and what they do
 ### checksec.sh
-https://github.com/slimm609/checksec.sh
-実行ファイルが備えているセキュリティ機構を読みやすい形式で表示してくれるシェルスクリプト。
+https://github.com/slimm609/checksec.sh  
+実行ファイルが備えているセキュリティ機構を読みやすい形式で表示してくれるシェルスクリプト。  
 RELRO, SSP, NX bitの確認を行う。
 
-RELRO: RElocation ReadOnly
-メモリ上に配置されるデータのどの部分に対してReadOnly属性を付けるかを決定。
+RELRO: RElocation ReadOnly  
+メモリ上に配置されるデータのどの部分に対してReadOnly属性を付けるかを決定。  
 - No RELRO
 - Partial RELRO (Lazy)
 - Full RELRO
-の３種類が存在し、GOT Overwrite exploitを行えるかを判断
-GOT Overwrite攻撃が成功するのは、No RELROとPartial RELROの場合のみ。詳しくは後述する。
+の３種類が存在し、GOT Overwrite exploitを行えるかを判断  
+GOT Overwrite攻撃が成功するのは、No RELROとPartial RELROの場合のみ。詳しくは後述する。  
 
-Stack Smash Protection (SSP)
-スタックフレームのローカル変数領域とSaved EBPの間にCanaryと呼ばれる値を挿入し、関数の終了時にその値が書き換えられているかどうかを判定するこでBuffer Overflowの検出を行う。Canary値には乱数が用いられるが、LSBがnullバイトになるようになってる。
-多くのコンパイラではこのSSPが有効になってるが、gccではコンパイルするときに`-fno-stack-protector`オプションを指定することで無効化できる。
+Stack Smash Protection (SSP)  
+スタックフレームのローカル変数領域とSaved EBPの間にCanaryと呼ばれる値を挿入し、関数の終了時にその値が書き換えられているかどうかを判定するこでBuffer Overflowの検出を行う。Canary値には乱数が用いられるが、LSBがnullバイトになるようになってる。  
+多くのコンパイラではこのSSPが有効になってるが、gccではコンパイルするときに`-fno-stack-protector`オプションを指定することで無効化できる。  
 
-NX bit: No execute bit
+NX bit: No execute bit  
 メモリ上の実効する必要のないデータを実効不可能に設定することで、攻撃者がシェルコードを使って攻撃するのを困難にする。任意コードの実効が不可能になるため、実効可能コードの断片をうまく組み合わせて攻撃することになる。gccでは`-z execstack`オプションをコンパイル時に付与することでNX bitを無効化できる。
 
-ASLR: Address Space Layout Randomization
-スタックやヒープ、共有ライブラリ等をメモリに配置するときに、アドレスの一部をランダム化することで攻撃者がアドレスを推測するのを困難にする。CTFではほとんどの問題でASLR有効になってる。
-Ubuntu 14.04 LTSでは次のコマンドでON/OFFを切り替え。
+ASLR: Address Space Layout Randomization  
+スタックやヒープ、共有ライブラリ等をメモリに配置するときに、アドレスの一部をランダム化することで攻撃者がアドレスを推測するのを困難にする。CTFではほとんどの問題でASLR有効になってる。  
+Ubuntu 14.04 LTSでは次のコマンドでON/OFFを切り替え。  
 ```
 ON: $ sudo sysctl -w kernel.randomize_va_space=2
 OFF: $ sudo sysctl -w kernel.randomize_va_space=0
