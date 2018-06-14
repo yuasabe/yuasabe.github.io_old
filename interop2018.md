@@ -1,2 +1,4 @@
 # Interop Tokyo 2018
-I joined in Interop 2018 from the second day. These are some notes on the sessions and the booths.
+I joined in Interop 2018 from the second day. These are some notes on the sessions and the booths. Interop is a global tech/business event focused on the newest tech/cyber trends. Leading vendors from various tech fields meet in one location to showcase their latest developments and products. This year, the event was held from June 13-15 in Makuhari Messe. On the second day, June 14th, I will be joining in the Interop conference also held in the same venue, listening in to three sessions from leading experts in the tech/security field. Interop is also the home to "ShowNet", which is a comprehensive internet technology demonstration that utilizes the latest network related technology to combine thousands of products and services into one big network. This not only serves stable internet connection to the attendees but also demonstrates the latest research and development related to internet interoperability and security. The following would be my memos and thoughts of joining in from the second day.
+
+## June 14th, 2018
