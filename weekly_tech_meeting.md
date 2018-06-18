@@ -27,3 +27,14 @@ We worked with a simple LAMP server with a vulnerable PHP application running. T
 We were working with a simple centos6 vagrant box this time for the vulnerable application, but things would be much faster and easier to operate if we can create LAMP servers with specific configurations with Docker containers. Will be looking into that.
 
 ## 6/13 TBD
+
+- 環境を簡単に構築するために、Dockerを始めとするコンテナ技術を活用する。
+- OS-level virtualization, containers, kubernetes
+- Create a LAMP using Docker Hub official images
+- 1 containr 1 daemon
+- what is a daemon, server program
+- lamp needs 2 containers
+- docker compose : orchestration tool, control multiple daemons
+- コンテナの設定ファイル：dockerfile
+- DockerComposeの設定ファイル：YAML file
+
