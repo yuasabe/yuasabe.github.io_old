@@ -1,0 +1,4 @@
+- logic programming
+- procedural programming
+- functional programming
+- object-oriented programming
