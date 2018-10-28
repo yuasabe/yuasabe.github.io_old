@@ -72,4 +72,19 @@ docker-compose up -d
 - change /etc/apache2/conf-available/security.conf ServerToken
 - add security.conf to php Dockerfile
 - What is kubernates?
+- Add CSP header and check that js script was not read on browser
+
+## 6/27 TBD
+- 前回の復習
+	- CSPヘッダーを加えてブラウザで動作を確認
+- apacheのconfファイルの運営のベストプラクティス
+```
+# ubuntuの場合
+/etc/apache2/apache2.conf
+			/conf-available/
+			/conf-enabled/
+# apache2は直接編集しない方がよい。available下に追加。
+```
+- デーモン、イメージを説明できるか
+- goのイメージを持ってきて、golangでCSPを設定（次回までに）
 
