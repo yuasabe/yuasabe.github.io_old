@@ -4,6 +4,7 @@
 - [weekly tech meeting notes](/weekly_tech_meeting)
 - [Interop 2018](/interop2018)
 - [Learning C](/c_lang)
+- [gnuplot](/gnuplot)
 
 contacts  
 yuasabe[at]gmail.com
