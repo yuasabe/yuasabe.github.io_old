@@ -5,6 +5,7 @@
 - [Interop 2018](/interop2018)
 - [Learning C](/c_lang)
 - [gnuplot](/gnuplot)
+- [daily notes (school)](/school)
 
 contacts  
 yuasabe[at]gmail.com
