@@ -1,3 +1,5 @@
+{% include lib/mathjax.html %}
+
 ## 11/19 Mon
 ### ディジタル回路
 - Sequential logic design
