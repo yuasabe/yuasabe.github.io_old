@@ -11,6 +11,7 @@
 ### 電磁気
 - 磁気（1回目）
 - イントロ、電磁気のつながり、フェイマン物理すごい
+you can use an inline formula $$\forall x \in R$$ like this one
 - アンペール力
 - 磁界
 - 磁束密度
