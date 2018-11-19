@@ -11,8 +11,8 @@
 ### 電磁気
 - 磁気（1回目）
 - イントロ、電磁気のつながり、フェイマン物理すごい
-you can use an inline formula $$\forall x \in R$$ like this one
 - アンペール力
+  - 平行な導線間に働くアンペール力 $F=\frac{\mu_0}{2\pi}\frac{I_1I_2}{R}$
 - 磁界
 - 磁束密度
 - ローレンツ力
