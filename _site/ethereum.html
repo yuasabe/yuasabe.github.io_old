@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>ethereum | yuasabe</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="ethereum" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="yuasabe.github.io" />
+<meta property="og:description" content="yuasabe.github.io" />
+<link rel="canonical" href="http://localhost:4000/ethereum.html" />
+<meta property="og:url" content="http://localhost:4000/ethereum.html" />
+<meta property="og:site_name" content="yuasabe" />
+<script type="application/ld+json">
+{"description":"yuasabe.github.io","@type":"WebPage","url":"http://localhost:4000/ethereum.html","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4"}},"headline":"ethereum","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">yuasabe</a></h1>
+        
+        
+          <img src="https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4" alt="Logo" />
+        
+
+        <p>yuasabe.github.io</p>
+
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h2 id="ethereum">ethereum</h2>
+
+<h3 id="バックグラウンドでgethを起動">バックグラウンドでGethを起動</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nohup geth --networkid 4649 --nodiscover --maxpeers 0 --datadir /home/yuasabe/data_testnet --mine --minerthreads 1 --rpc 2&gt;&gt; /home/yuasabe/data_testnet/geth.log &amp;
+
+ps -ax | grep geth
+
+geth attach rpc:http://localhost:8545
+
+nohup geth --networkid 4649 --nodiscover --maxpeers 0 --datadir /home/yuasabe/data_testnet --mine --minerthreads 1 --rpc --rpcaddr "0.0.0.0" --rpcport 8545 --rpccorsdomain "*" --rpcapi "admin,db,eth,debug,miner,net,shh,txpool,personal,web3" --unlock 0,1 --password /home/yuasabe/data_testnet/passwd --verbosity 6 2&gt;&gt; /home/yuasabe/data_testnet/geth.log &amp;
+
+admin.setSolc("/usr/bin/solc")
+
+</code></pre></div></div>
+
+
+      </section>
+      <footer>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-120752245-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    
+  </body>
+</html>

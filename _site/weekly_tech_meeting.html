@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Weekly Tech Meeting at Gracia | yuasabe</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="Weekly Tech Meeting at Gracia" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="yuasabe.github.io" />
+<meta property="og:description" content="yuasabe.github.io" />
+<link rel="canonical" href="http://localhost:4000/weekly_tech_meeting.html" />
+<meta property="og:url" content="http://localhost:4000/weekly_tech_meeting.html" />
+<meta property="og:site_name" content="yuasabe" />
+<script type="application/ld+json">
+{"description":"yuasabe.github.io","@type":"WebPage","url":"http://localhost:4000/weekly_tech_meeting.html","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4"}},"headline":"Weekly Tech Meeting at Gracia","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">yuasabe</a></h1>
+        
+        
+          <img src="https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4" alt="Logo" />
+        
+
+        <p>yuasabe.github.io</p>
+
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="weekly-tech-meeting-at-gracia">Weekly Tech Meeting at Gracia</h1>
+
+<h2 id="66-security-xsssqli-workshop">6/6 Security, XSS/SQLi Workshop</h2>
+<h3 id="why-did-tls-replace-ssl">Why did TLS replace SSL?</h3>
+<p>SSL is an older version of TLS. What specific security vulnerability in the SSL protocol lead to the widespread use of TLS?</p>
+
+<h3 id="tlsで通信を始める時に行われるハンドシェイク">TLSで通信を始める時に行われるハンドシェイク</h3>
+<ul>
+  <li>公開鍵認証情報の交換</li>
+  <li>どの暗号方式に対応しているか<br />
+https://msdn.microsoft.com/en-us/library/windows/desktop/aa380513(v=vs.85).aspx</li>
+</ul>
+
+<h3 id="reviewquestions">Review/Questions</h3>
+<ul>
+  <li>How does TLS work?</li>
+  <li>Can you implement a minimum working example of a TLS protocol?</li>
+  <li>How safe is RSA?</li>
+  <li>What differentiates an old RSA implmentation from newer versions?
+    <ul>
+      <li>mainly the key bit sizes, previously 324 bits but increased up to 1025 bits.</li>
+    </ul>
+  </li>
+  <li>What is elliptic curve cryptography? Explain the basic mechanisims.</li>
+  <li>Dissecting a TLS client hello message packet, lists of supported cipher suites. What is inside a basic TLS packet.</li>
+  <li>Supported Cipher suites and TLS versions.</li>
+  <li>Old IEs do not support modern TLS cipher suites. This makes for a good reason(excuse) for persuading the business guys for not forcing complete IE support.</li>
+</ul>
+
+<h3 id="xxs-sqli">XXS, SQLi</h3>
+<p>We worked with a simple LAMP server with a vulnerable PHP application running. The application did basic CRUD instructions on a MySQL database on the same server, making it a good bait for some stored SQLi attacks. We explored some of the basic ideas of SQLi, actually deleting or manipulating data.</p>
+
+<h3 id="additional-thoughts">Additional thoughts</h3>
+<p>We were working with a simple centos6 vagrant box this time for the vulnerable application, but things would be much faster and easier to operate if we can create LAMP servers with specific configurations with Docker containers. Will be looking into that.</p>
+
+<h2 id="613-docker-and-containers">6/13 Docker and Containers</h2>
+
+<ul>
+  <li>環境を簡単に構築するために、Dockerを始めとするコンテナ技術を活用する。</li>
+  <li>OS-level virtualization, containers, kubernetes</li>
+  <li>Create a LAMP using Docker Hub official images</li>
+  <li>1 containr 1 daemon</li>
+  <li>what is a daemon, server program</li>
+  <li>lamp needs 2 containers</li>
+  <li>docker compose : orchestration tool, control multiple daemons</li>
+  <li>コンテナの設定ファイル：dockerfile</li>
+  <li>DockerComposeの設定ファイル：YAML file</li>
+  <li>
+    <h2 id="docker-composeを使ってlamp環境をつくる"><a href="https://qiita.com/naga3/items/d1a6e8bbd0799159042e">Docker Composeを使ってLAMP環境をつくる</a></h2>
+  </li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ git clone https://github.com/naga3/docker-lamp.git
+$ cd docker-lamp/
+$ docker-compose up -d
+</code></pre></div></div>
+
+<h2 id="622-content-security-policy">6/22 Content Security Policy</h2>
+<ul>
+  <li>Content Security Policyに対応する</li>
+  <li>クロスオリジンの構成を把握する</li>
+  <li>コンテンツ側のURLをチェック</li>
+  <li>
+    <p>サーバ側：レスポンスヘッダに追加が必要</p>
+  </li>
+  <li>セキュリティ関連のテストを行うためにDockerを使えると楽</li>
+  <li>DevOps : インフラ構築をコード作成に似せていく</li>
+</ul>
+
+<h3 id="what-we-want-to-do">What we want to do</h3>
+<ul>
+  <li>Content Security Policy ヘッダーをレスポンスに追加してブラウザで確認してもらう。</li>
+  <li>report-uriを設定してエラーレポートがjsonで返って来るのを拾う。</li>
+</ul>
+
+<h3 id="steps">Steps</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-compose down
+docker ps -a
+docker images
+docker rmi docker-lamp_php
+docker-compose up -d
+</code></pre></div></div>
+
+<ul>
+  <li>change /etc/apache2/conf-available/security.conf ServerToken</li>
+  <li>add security.conf to php Dockerfile</li>
+  <li>What is kubernates?</li>
+  <li>Add CSP header and check that js script was not read on browser</li>
+</ul>
+
+<h2 id="627-tbd">6/27 TBD</h2>
+<ul>
+  <li>前回の復習
+    <ul>
+      <li>CSPヘッダーを加えてブラウザで動作を確認</li>
+    </ul>
+  </li>
+  <li>apacheのconfファイルの運営のベストプラクティス
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># ubuntuの場合
+/etc/apache2/apache2.conf
+          /conf-available/
+          /conf-enabled/
+# apache2は直接編集しない方がよい。available下に追加。
+</code></pre></div>    </div>
+  </li>
+  <li>デーモン、イメージを説明できるか</li>
+  <li>goのイメージを持ってきて、golangでCSPを設定（次回までに）</li>
+</ul>
+
+
+
+      </section>
+      <footer>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-120752245-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    
+  </body>
+</html>

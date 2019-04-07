@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Learning C | yuasabe</title>
+<meta name="generator" content="Jekyll v3.7.4" />
+<meta property="og:title" content="Learning C" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="yuasabe.github.io" />
+<meta property="og:description" content="yuasabe.github.io" />
+<link rel="canonical" href="http://localhost:4000/c_lang.html" />
+<meta property="og:url" content="http://localhost:4000/c_lang.html" />
+<meta property="og:site_name" content="yuasabe" />
+<script type="application/ld+json">
+{"description":"yuasabe.github.io","@type":"WebPage","url":"http://localhost:4000/c_lang.html","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4"}},"headline":"Learning C","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">yuasabe</a></h1>
+        
+        
+          <img src="https://avatars3.githubusercontent.com/u/5180742?s=400&u=2d2abb484ef4fca12fe432ac562b6ff69aa70278&v=4" alt="Logo" />
+        
+
+        <p>yuasabe.github.io</p>
+
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h2 id="learning-c">Learning C</h2>
+<p>(last updated: 10/28/2018)</p>
+
+<h3 id="ファイルから入出力">ファイルから入出力</h3>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 文字単位での入出力
+// 1文字読み込み、終了時はEOF
+</span><span class="kt">int</span> <span class="n">getc</span><span class="p">(</span><span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">)</span>
+
+<span class="c1">// 1文字書き込み
+// 成功時：書き込んだ文字
+// 失敗時：EOF
+</span><span class="kt">int</span> <span class="n">putc</span><span class="p">(</span><span class="kt">int</span> <span class="n">c</span><span class="p">,</span> <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">)</span>
+
+<span class="c1">// 行（文字列）単位での入出力
+// fpから書式つきで読み込む(scanf)
+// 成功時：代入された入力項目数
+// 失敗時：EOF
+</span><span class="kt">int</span> <span class="n">fscanf</span><span class="p">(</span><span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">format</span><span class="p">)</span>
+
+<span class="c1">// fpに書式つき(printf)で書き込む
+// 成功時：書き出された文字数
+// 失敗時：負の数
+</span><span class="kt">int</span> <span class="n">fprintf</span><span class="p">(</span><span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span> <span class="n">format</span><span class="p">)</span>
+
+<span class="c1">// 最大n文字分1行読み込み文字列sに格納
+// 正常終了時NULL返す
+</span><span class="kt">int</span> <span class="n">fgets</span><span class="p">(</span><span class="kt">char</span> <span class="n">buf</span><span class="o">*</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">,</span> <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">)</span>
+
+<span class="c1">// fpで指定したファイルに文字列sを書き込む
+// 書き込み成功時：正の値
+// 書き込み失敗時：EOF
+</span><span class="kt">int</span> <span class="n">fputs</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">s</span><span class="p">,</span> <span class="kt">FILE</span> <span class="o">*</span><span class="n">fp</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+
+      </section>
+      <footer>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-120752245-1', 'auto');
+      ga('send', 'pageview');
+    </script>
+    
+  </body>
+</html>
