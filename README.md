@@ -68,6 +68,7 @@ Investigating Universal Metrics of Vulnerability Regarding Cross-Site Scripting 
 - [Interop 2018](/interop2018)
 - [Learning C](/c_lang)
 - [gnuplot](/gnuplot)
+- [12ステップで作る組込みOS自作入門](/12step)
 
 contacts  
 yuasabe[at]gmail.com
